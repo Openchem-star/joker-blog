@@ -1,0 +1,992 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>我的 Blog 记录</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.8.1/github-markdown-light.min.css">
+
+  <style>
+    :root {
+      --bg: #f3f6fb;
+      --card: #ffffff;
+      --line: #d8dee9;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #2563eb;
+      --accent-soft: #e8f0ff;
+      --danger: #dc2626;
+      --tag-bg: #eef2ff;
+      --tag-text: #3730a3;
+      --shadow: 0 8px 24px rgba(15, 23, 42, 0.07);
+      --ok: #059669;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: radial-gradient(1200px 500px at 20% -10%, #eaf2ff, transparent),
+        radial-gradient(1000px 400px at 100% -20%, #e8fff5, transparent),
+        var(--bg);
+    }
+
+    header {
+      min-height: 58px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      flex-wrap: wrap;
+    }
+
+    .title { font-size: 18px; font-weight: 700; letter-spacing: .2px; }
+    .hint { color: var(--muted); font-size: 13px; }
+
+    .top-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .cloud-status { font-size: 12px; color: var(--muted); }
+    .cloud-status.ok { color: var(--ok); }
+
+    .layout {
+      height: calc(100vh - 58px);
+      display: grid;
+      grid-template-columns: 320px 1fr 1fr;
+      gap: 12px;
+      padding: 12px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .panel-head {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    .btn {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      border-radius: 10px;
+      padding: 6px 10px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all .15s ease;
+    }
+    .btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+    .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-primary:hover { color: #fff; filter: brightness(1.03); }
+    .btn-danger:hover { border-color: var(--danger); color: var(--danger); }
+
+    .search-wrap { padding: 10px 10px 0; }
+
+    input[type="text"], input[type="search"] {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 13px;
+      min-width: 160px;
+      outline: none;
+      width: 100%;
+      color: var(--text);
+      background: #fff;
+    }
+    input[type="text"]:focus, input[type="search"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px #e7efff;
+    }
+
+    .filter-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      max-height: 86px;
+      overflow: auto;
+    }
+
+    .chip {
+      border: 1px solid #dbe4ff;
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      border-radius: 999px;
+      padding: 2px 9px;
+      font-size: 12px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .chip.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .articles { overflow: auto; padding: 8px; }
+
+    .article-item {
+      width: 100%;
+      text-align: left;
+      border: 1px solid transparent;
+      background: #fff;
+      padding: 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-bottom: 8px;
+      transition: all .15s ease;
+    }
+    .article-item:hover {
+      border-color: #cbd5e1;
+      background: #f8fbff;
+      transform: translateY(-1px);
+    }
+    .article-item.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .article-title {
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.4;
+      margin-bottom: 6px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .article-meta { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+
+    .article-tags {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-top: 2px;
+    }
+    .article-tag {
+      font-size: 11px;
+      color: var(--tag-text);
+      background: var(--tag-bg);
+      border: 1px solid #dbe4ff;
+      border-radius: 999px;
+      padding: 1px 7px;
+    }
+
+    .editor-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
+    .tags-input-wrap {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      width: 100%;
+      margin-top: 6px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      outline: none;
+      resize: none;
+      padding: 14px;
+      font-size: 15px;
+      line-height: 1.65;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+      color: var(--text);
+      background: #fff;
+    }
+
+    .preview-wrap { height: 100%; overflow: auto; padding: 18px; background: #fcfdff; }
+    .markdown-body {
+      max-width: 860px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #edf0f6;
+    }
+
+    .empty { color: var(--muted); padding: 16px; font-size: 13px; }
+
+    @media (max-width: 1240px) {
+      .layout { grid-template-columns: 280px 1fr 1fr; }
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 1fr;
+        height: auto;
+        min-height: calc(100vh - 58px);
+      }
+      .panel { min-height: 42vh; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title">我的 Blog（生活 & 学习）</div>
+    <div class="top-right">
+      <span class="cloud-status" id="cloudStatus">未连接云同步</span>
+      <button class="btn" id="loginBtn">GitHub 登录同步</button>
+      <button class="btn" id="logoutBtn" style="display:none">退出登录</button>
+      <span class="hint" id="saveStatus">已自动保存</span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel">
+      <div class="panel-head">
+        <span>文章列表</span>
+        <div class="toolbar">
+          <button class="btn btn-primary" id="newArticleBtn">+ 新建</button>
+          <button class="btn" id="exportAllBtn">导出全部 ZIP</button>
+        </div>
+      </div>
+
+      <div class="search-wrap">
+        <input id="searchInput" type="search" placeholder="搜索标题 / 内容 / 标签" />
+      </div>
+
+      <div class="filter-tags" id="tagFilterWrap"></div>
+      <div class="articles" id="articleList"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div class="editor-toolbar">
+          <span>Markdown 编辑区</span>
+          <input id="titleInput" type="text" placeholder="文章标题" style="max-width: 220px;" />
+          <button class="btn" id="renameBtn">改名</button>
+          <button class="btn" id="exportBtn">导出 .md</button>
+          <button class="btn" id="importBtn">导入 .md</button>
+          <button class="btn btn-danger" id="deleteBtn">删除</button>
+          <input id="importFileInput" type="file" accept=".md,text/markdown" style="display:none" />
+        </div>
+
+        <div class="tags-input-wrap">
+          <input id="tagsInput" type="text" placeholder="标签（用逗号分隔，如：学习,生活,AI）" />
+          <button class="btn" id="saveTagsBtn">保存标签</button>
+        </div>
+      </div>
+
+      <textarea id="editor" placeholder="# 今天记录\n\n- 学了什么\n- 想了什么\n- 明天做什么\n"></textarea>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <span>实时预览区（GitHub 风格）</span>
+      </div>
+      <div class="preview-wrap">
+        <article id="preview" class="markdown-body"></article>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    // 你的 Supabase 配置（可公开放前端，需配合 RLS）
+    const SUPABASE_URL = 'https://gitfkpmvofvjfdqikkxa.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_jpVST_WYEJW6RiEb2CPK1g_NOpWFeVj';
+
+    const STORAGE_KEY = 'my_blog_articles_v4';
+    const LEGACY_KEYS = ['my_blog_articles_v3', 'my_blog_articles_v2', 'my_blog_markdown_content_v1'];
+
+    const articleListEl = document.getElementById('articleList');
+    const tagFilterWrap = document.getElementById('tagFilterWrap');
+    const newArticleBtn = document.getElementById('newArticleBtn');
+    const exportAllBtn = document.getElementById('exportAllBtn');
+    const searchInput = document.getElementById('searchInput');
+
+    const renameBtn = document.getElementById('renameBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const importBtn = document.getElementById('importBtn');
+    const importFileInput = document.getElementById('importFileInput');
+    const deleteBtn = document.getElementById('deleteBtn');
+    const titleInput = document.getElementById('titleInput');
+    const tagsInput = document.getElementById('tagsInput');
+    const saveTagsBtn = document.getElementById('saveTagsBtn');
+
+    const editor = document.getElementById('editor');
+    const preview = document.getElementById('preview');
+    const saveStatus = document.getElementById('saveStatus');
+
+    const cloudStatus = document.getElementById('cloudStatus');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    marked.setOptions({ breaks: true, gfm: true, headerIds: true, mangle: false });
+
+    let state = {
+      activeId: null,
+      search: '',
+      selectedTag: '',
+      articles: []
+    };
+
+    let supabaseClient = null;
+    let currentUser = null;
+    let cloudPushTimer = null;
+    let suppressCloudPush = false;
+
+    function now() { return new Date().toISOString(); }
+    function newId() {
+      return (window.crypto && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : 'a_' + Math.random().toString(36).slice(2, 11);
+    }
+
+    function formatTime(iso) {
+      const d = new Date(iso);
+      return d.toLocaleString();
+    }
+
+    function defaultContent() {
+      return `# 欢迎使用我的 Blog\n\n这是一个用于记录 **生活** 和 **学习** 的小站。\n\n## 今日计划\n- [ ] 阅读 30 分钟\n- [ ] 复盘今天收获\n- [ ] 写一段总结\n\n> 持续记录，向内求，慢慢变强。`;
+    }
+
+    function activeArticle() {
+      return state.articles.find(a => a.id === state.activeId) || null;
+    }
+
+    function setStatus(text) { saveStatus.textContent = text; }
+
+    function setCloudStatus(text, ok = false) {
+      cloudStatus.textContent = text;
+      cloudStatus.classList.toggle('ok', ok);
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      setStatus('已自动保存 · ' + new Date().toLocaleTimeString());
+      scheduleCloudPush();
+    }
+
+    function renderPreview(md) {
+      preview.innerHTML = marked.parse(md || '');
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function sanitizeFilename(name) {
+      const base = (name || 'untitled')
+        .replace(/[\\/:*?"<>|]+/g, '_')
+        .replace(/\s+/g, ' ')
+        .trim();
+      return (base || 'untitled').slice(0, 80);
+    }
+
+    function parseTags(raw) {
+      return Array.from(new Set((raw || '')
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean)));
+    }
+
+    function allTags() {
+      const set = new Set();
+      state.articles.forEach(a => (a.tags || []).forEach(t => set.add(t)));
+      return Array.from(set).sort((a, b) => a.localeCompare(b, 'zh-CN'));
+    }
+
+    function filteredArticles() {
+      const q = (state.search || '').trim().toLowerCase();
+      const selectedTag = state.selectedTag;
+
+      const list = [...state.articles]
+        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
+      return list.filter(a => {
+        const tags = a.tags || [];
+        if (selectedTag && !tags.includes(selectedTag)) return false;
+        if (!q) return true;
+
+        const haystack = [a.title || '', a.content || '', tags.join(' ')].join('\n').toLowerCase();
+        return haystack.includes(q);
+      });
+    }
+
+    function renderTagFilter() {
+      const tags = allTags();
+      tagFilterWrap.innerHTML = '';
+
+      const allChip = document.createElement('button');
+      allChip.className = 'chip' + (!state.selectedTag ? ' active' : '');
+      allChip.textContent = '全部';
+      allChip.addEventListener('click', () => {
+        state.selectedTag = '';
+        renderTagFilter();
+        renderArticleList();
+        saveState();
+      });
+      tagFilterWrap.appendChild(allChip);
+
+      tags.forEach(tag => {
+        const chip = document.createElement('button');
+        chip.className = 'chip' + (state.selectedTag === tag ? ' active' : '');
+        chip.textContent = tag;
+        chip.addEventListener('click', () => {
+          state.selectedTag = state.selectedTag === tag ? '' : tag;
+          renderTagFilter();
+          renderArticleList();
+          saveState();
+        });
+        tagFilterWrap.appendChild(chip);
+      });
+    }
+
+    function renderArticleList() {
+      articleListEl.innerHTML = '';
+      const list = filteredArticles();
+
+      if (!list.length) {
+        articleListEl.innerHTML = '<div class="empty">没有匹配的文章，试试调整搜索词或标签。</div>';
+        return;
+      }
+
+      list.forEach(article => {
+        const btn = document.createElement('button');
+        btn.className = 'article-item' + (article.id === state.activeId ? ' active' : '');
+        const tagsHtml = (article.tags || []).map(t => `<span class="article-tag">${escapeHtml(t)}</span>`).join('');
+
+        btn.innerHTML = `
+          <div class="article-title">${escapeHtml(article.title || '未命名文章')}</div>
+          <div class="article-meta">更新于 ${formatTime(article.updatedAt)}</div>
+          <div class="article-tags">${tagsHtml || ''}</div>
+        `;
+
+        btn.addEventListener('click', () => switchArticle(article.id));
+        articleListEl.appendChild(btn);
+      });
+    }
+
+    function renderEditor() {
+      const a = activeArticle();
+      if (!a) {
+        titleInput.value = '';
+        tagsInput.value = '';
+        editor.value = '';
+        renderPreview('');
+        return;
+      }
+
+      titleInput.value = a.title || '';
+      tagsInput.value = (a.tags || []).join(', ');
+      editor.value = a.content || '';
+      renderPreview(a.content || '');
+    }
+
+    function switchArticle(id) {
+      state.activeId = id;
+      renderArticleList();
+      renderEditor();
+      saveState();
+    }
+
+    function createArticle(title = '新文章') {
+      const t = now();
+      const article = {
+        id: newId(),
+        title,
+        tags: [],
+        content: state.articles.length ? '' : defaultContent(),
+        createdAt: t,
+        updatedAt: t
+      };
+      state.articles.push(article);
+      state.activeId = article.id;
+      renderTagFilter();
+      renderArticleList();
+      renderEditor();
+      saveState();
+    }
+
+    async function deleteActiveArticle() {
+      const a = activeArticle();
+      if (!a) return;
+      if (!confirm(`确认删除文章《${a.title || '未命名文章'}》吗？此操作不可撤销。`)) return;
+
+      state.articles = state.articles.filter(x => x.id !== a.id);
+      state.activeId = state.articles[0]?.id || null;
+
+      renderTagFilter();
+      renderArticleList();
+      renderEditor();
+      saveState();
+
+      if (supabaseClient && currentUser) {
+        await supabaseClient.from('blog_articles').delete().eq('id', a.id).eq('user_id', currentUser.id);
+      }
+    }
+
+    function renameActiveArticle() {
+      const a = activeArticle();
+      if (!a) return;
+
+      const t = (titleInput.value || '').trim();
+      if (!t) {
+        alert('标题不能为空');
+        titleInput.focus();
+        return;
+      }
+
+      a.title = t;
+      a.updatedAt = now();
+      renderArticleList();
+      saveState();
+    }
+
+    function saveTagsForActiveArticle() {
+      const a = activeArticle();
+      if (!a) return;
+      a.tags = parseTags(tagsInput.value);
+      a.updatedAt = now();
+      renderTagFilter();
+      renderArticleList();
+      saveState();
+      setStatus('标签已保存 · ' + new Date().toLocaleTimeString());
+    }
+
+    function exportActiveArticleAsMarkdown() {
+      const a = activeArticle();
+      if (!a) {
+        alert('当前没有可导出的文章');
+        return;
+      }
+
+      const header = (a.tags && a.tags.length)
+        ? `<!-- tags: ${a.tags.join(', ')} -->\n\n`
+        : '';
+      const content = header + (a.content || '');
+      const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${sanitizeFilename(a.title)}.md`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      setStatus('导出成功 · ' + new Date().toLocaleTimeString());
+    }
+
+    async function exportAllAsZip() {
+      if (!state.articles.length) {
+        alert('没有文章可导出');
+        return;
+      }
+
+      if (!window.JSZip) {
+        alert('ZIP 组件加载失败，请刷新重试');
+        return;
+      }
+
+      setStatus('正在打包 ZIP...');
+      const zip = new JSZip();
+
+      state.articles.forEach(a => {
+        const tagsHeader = (a.tags && a.tags.length) ? `<!-- tags: ${a.tags.join(', ')} -->\n` : '';
+        const metaHeader = `<!-- created: ${a.createdAt} | updated: ${a.updatedAt} -->\n`;
+        const content = `${metaHeader}${tagsHeader}\n${a.content || ''}`;
+        zip.file(`${sanitizeFilename(a.title || 'untitled')}.md`, content);
+      });
+
+      const blob = await zip.generateAsync({ type: 'blob' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.href = url;
+      link.download = `my-blog-export-${new Date().toISOString().slice(0, 10)}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      setStatus('已导出全部 ZIP · ' + new Date().toLocaleTimeString());
+    }
+
+    function importMarkdownToActiveArticle(file) {
+      const a = activeArticle();
+      if (!a) {
+        alert('当前没有可导入的文章');
+        return;
+      }
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const text = String(reader.result || '');
+        a.content = text;
+        a.updatedAt = now();
+
+        const currentTitle = (a.title || '').trim();
+        if (!currentTitle || currentTitle === '新文章' || currentTitle === '未命名文章') {
+          const name = file.name.replace(/\.md$/i, '').trim();
+          if (name) a.title = name;
+        }
+
+        renderArticleList();
+        renderEditor();
+        saveState();
+        setStatus('导入成功 · ' + new Date().toLocaleTimeString());
+      };
+      reader.onerror = () => alert('导入失败，请重试');
+      reader.readAsText(file, 'utf-8');
+    }
+
+    function importMarkdownAsNewArticle(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const text = String(reader.result || '');
+        const titleFromFile = file.name.replace(/\.md$/i, '').trim() || '导入文章';
+        const t = now();
+        const article = {
+          id: newId(),
+          title: titleFromFile,
+          tags: [],
+          content: text,
+          createdAt: t,
+          updatedAt: t
+        };
+        state.articles.push(article);
+        state.activeId = article.id;
+        renderTagFilter();
+        renderArticleList();
+        renderEditor();
+        saveState();
+        setStatus('已导入为新文章 · ' + new Date().toLocaleTimeString());
+      };
+      reader.onerror = () => alert('导入失败，请重试');
+      reader.readAsText(file, 'utf-8');
+    }
+
+    function migrateLegacyDataIfNeeded() {
+      const rawV4 = localStorage.getItem(STORAGE_KEY);
+      if (rawV4) return;
+
+      for (const key of LEGACY_KEYS) {
+        const raw = localStorage.getItem(key);
+        if (!raw) continue;
+
+        try {
+          if (key === 'my_blog_markdown_content_v1') {
+            const t = now();
+            const article = {
+              id: newId(),
+              title: '迁移文章',
+              tags: [],
+              content: raw,
+              createdAt: t,
+              updatedAt: t
+            };
+            state = { activeId: article.id, search: '', selectedTag: '', articles: [article] };
+            saveState();
+            return;
+          }
+
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed.articles)) {
+            state = {
+              activeId: parsed.activeId || parsed.articles[0]?.id || null,
+              search: parsed.search || '',
+              selectedTag: parsed.selectedTag || '',
+              articles: parsed.articles.map(a => ({
+                id: a.id || newId(),
+                title: a.title || '未命名文章',
+                tags: Array.isArray(a.tags) ? a.tags : [],
+                content: a.content || '',
+                createdAt: a.createdAt || now(),
+                updatedAt: a.updatedAt || now()
+              }))
+            };
+            saveState();
+            return;
+          }
+        } catch (_) {}
+      }
+    }
+
+    async function initSupabaseAuth() {
+      if (!window.supabase || !SUPABASE_URL || !SUPABASE_ANON_KEY) {
+        setCloudStatus('云同步未配置', false);
+        return;
+      }
+
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      currentUser = session?.user || null;
+      updateAuthUI();
+
+      if (currentUser) {
+        await pullFromCloudAndMerge();
+      }
+
+      supabaseClient.auth.onAuthStateChange(async (_event, sessionNow) => {
+        currentUser = sessionNow?.user || null;
+        updateAuthUI();
+        if (currentUser) {
+          await pullFromCloudAndMerge();
+        }
+      });
+    }
+
+    function updateAuthUI() {
+      if (currentUser) {
+        loginBtn.style.display = 'none';
+        logoutBtn.style.display = '';
+        setCloudStatus('云同步已连接', true);
+      } else {
+        loginBtn.style.display = '';
+        logoutBtn.style.display = 'none';
+        setCloudStatus('未连接云同步', false);
+      }
+    }
+
+    function mergeArticles(localArticles, cloudArticles) {
+      const map = new Map();
+      [...localArticles, ...cloudArticles].forEach(a => {
+        const old = map.get(a.id);
+        if (!old) {
+          map.set(a.id, a);
+          return;
+        }
+        const oldTime = new Date(old.updatedAt).getTime();
+        const newTime = new Date(a.updatedAt).getTime();
+        map.set(a.id, newTime >= oldTime ? a : old);
+      });
+      return [...map.values()].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    }
+
+    async function pullFromCloudAndMerge() {
+      if (!supabaseClient || !currentUser) return;
+      setCloudStatus('云端同步中...', false);
+
+      const { data, error } = await supabaseClient
+        .from('blog_articles')
+        .select('id,title,content,tags,created_at,updated_at')
+        .eq('user_id', currentUser.id)
+        .order('updated_at', { ascending: false });
+
+      if (error) {
+        setCloudStatus('同步失败，请检查表和RLS', false);
+        console.error(error);
+        return;
+      }
+
+      const cloud = (data || []).map(r => ({
+        id: r.id,
+        title: r.title || '未命名文章',
+        content: r.content || '',
+        tags: Array.isArray(r.tags) ? r.tags : [],
+        createdAt: r.created_at || now(),
+        updatedAt: r.updated_at || now()
+      }));
+
+      const merged = mergeArticles(state.articles, cloud);
+
+      suppressCloudPush = true;
+      state.articles = merged;
+      if (!state.activeId || !state.articles.find(a => a.id === state.activeId)) {
+        state.activeId = state.articles[0]?.id || null;
+      }
+      renderTagFilter();
+      renderArticleList();
+      renderEditor();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      suppressCloudPush = false;
+
+      setCloudStatus('云同步已连接', true);
+      scheduleCloudPush();
+    }
+
+    function scheduleCloudPush() {
+      if (suppressCloudPush || !supabaseClient || !currentUser) return;
+      clearTimeout(cloudPushTimer);
+      cloudPushTimer = setTimeout(pushAllToCloud, 1200);
+    }
+
+    async function pushAllToCloud() {
+      if (!supabaseClient || !currentUser) return;
+      if (!state.articles.length) return;
+
+      const rows = state.articles.map(a => ({
+        id: a.id,
+        user_id: currentUser.id,
+        title: a.title || '',
+        content: a.content || '',
+        tags: Array.isArray(a.tags) ? a.tags : [],
+        created_at: a.createdAt || now(),
+        updated_at: a.updatedAt || now()
+      }));
+
+      const { error } = await supabaseClient
+        .from('blog_articles')
+        .upsert(rows, { onConflict: 'id' });
+
+      if (error) {
+        setCloudStatus('云同步失败，请检查RLS', false);
+        console.error(error);
+      } else {
+        setCloudStatus('云同步已连接', true);
+      }
+    }
+
+    async function signInWithGithub() {
+      if (!supabaseClient) return;
+      const redirectTo = window.location.origin + window.location.pathname;
+      const { error } = await supabaseClient.auth.signInWithOAuth({
+        provider: 'github',
+        options: { redirectTo }
+      });
+      if (error) alert('登录失败：' + error.message);
+    }
+
+    async function signOut() {
+      if (!supabaseClient) return;
+      const { error } = await supabaseClient.auth.signOut();
+      if (error) alert('退出失败：' + error.message);
+      else {
+        currentUser = null;
+        updateAuthUI();
+      }
+    }
+
+    function init() {
+      migrateLegacyDataIfNeeded();
+
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed.articles)) {
+            state = {
+              activeId: parsed.activeId || null,
+              search: parsed.search || '',
+              selectedTag: parsed.selectedTag || '',
+              articles: parsed.articles.map(a => ({
+                id: a.id || newId(),
+                title: a.title || '未命名文章',
+                content: a.content || '',
+                tags: Array.isArray(a.tags) ? a.tags : [],
+                createdAt: a.createdAt || now(),
+                updatedAt: a.updatedAt || now()
+              }))
+            };
+          }
+        } catch (_) {}
+      }
+
+      if (!state.articles.length) {
+        createArticle('我的第一篇');
+      } else {
+        if (!state.activeId || !state.articles.find(a => a.id === state.activeId)) {
+          state.activeId = state.articles[0].id;
+        }
+        searchInput.value = state.search || '';
+        renderTagFilter();
+        renderArticleList();
+        renderEditor();
+        saveState();
+      }
+
+      initSupabaseAuth();
+    }
+
+    let debounceTimer = null;
+    editor.addEventListener('input', () => {
+      const a = activeArticle();
+      if (!a) return;
+
+      a.content = editor.value;
+      a.updatedAt = now();
+      renderPreview(a.content);
+      setStatus('输入中...');
+
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        renderArticleList();
+        saveState();
+      }, 260);
+    });
+
+    searchInput.addEventListener('input', () => {
+      state.search = searchInput.value || '';
+      renderArticleList();
+      saveState();
+    });
+
+    newArticleBtn.addEventListener('click', () => {
+      const title = prompt('新文章标题（可留空）', '新文章');
+      createArticle((title || '新文章').trim() || '新文章');
+    });
+
+    renameBtn.addEventListener('click', renameActiveArticle);
+    saveTagsBtn.addEventListener('click', saveTagsForActiveArticle);
+    exportBtn.addEventListener('click', exportActiveArticleAsMarkdown);
+    exportAllBtn.addEventListener('click', exportAllAsZip);
+
+    importBtn.addEventListener('click', () => {
+      importFileInput.value = '';
+      importFileInput.click();
+    });
+
+    importFileInput.addEventListener('change', () => {
+      const file = importFileInput.files && importFileInput.files[0];
+      if (!file) return;
+      const mode = prompt('导入方式：\nA = 覆盖当前文章\nB = 导入为新文章', 'B');
+      const pick = (mode || 'B').trim().toUpperCase();
+      if (pick === 'A') importMarkdownToActiveArticle(file);
+      else importMarkdownAsNewArticle(file);
+    });
+
+    deleteBtn.addEventListener('click', deleteActiveArticle);
+    loginBtn.addEventListener('click', signInWithGithub);
+    logoutBtn.addEventListener('click', signOut);
+
+    init();
+  </script>
+</body>
+</html>
