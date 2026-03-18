@@ -25,6 +25,8 @@
       --radius-sm: 10px;
       --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
       --shadow-soft: 0 4px 14px rgba(15, 23, 42, 0.06);
+      --editor-fr: 1;
+      --preview-fr: 1;
     }
 
     * { box-sizing: border-box; }
@@ -87,7 +89,7 @@
     .layout {
       height: calc(100vh - 60px);
       display: grid;
-      grid-template-columns: 320px 1fr 1fr;
+      grid-template-columns: 320px minmax(360px, var(--editor-fr, 1fr)) 10px minmax(360px, var(--preview-fr, 1fr));
       gap: 12px;
       padding: 12px;
     }
@@ -102,6 +104,30 @@
       flex-direction: column;
       min-height: 0;
     }
+
+    .splitter {
+      align-self: stretch;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #d6e0f2, #c7d4ec);
+      cursor: col-resize;
+      user-select: none;
+      position: relative;
+      transition: opacity .16s ease;
+      opacity: .75;
+    }
+    .splitter:hover { opacity: 1; }
+    .splitter::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      width: 4px;
+      height: 46px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.8);
+    }
+
+    .panel-editor, .panel-preview { min-width: 0; }
 
     .panel-head {
       padding: 10px 12px;
@@ -342,11 +368,11 @@
     *::-webkit-scrollbar-thumb:hover { background: #bdcae2; background-clip: content-box; }
 
     @media (max-width: 1240px) {
-      .layout { grid-template-columns: 280px 1fr 1fr; }
+      .layout { grid-template-columns: 280px minmax(320px, var(--editor-fr, 1fr)) 10px minmax(320px, var(--preview-fr, 1fr)); }
     }
 
     body.list-collapsed .layout {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: minmax(320px, var(--editor-fr, 1fr)) 10px minmax(320px, var(--preview-fr, 1fr));
     }
 
     body.list-collapsed .panel-list {
@@ -359,6 +385,7 @@
         height: auto;
         min-height: calc(100vh - 60px);
       }
+      .splitter { display: none; }
       .panel { min-height: 42vh; }
       .title { font-size: 17px; }
     }
@@ -403,7 +430,7 @@
       <div class="articles" id="articleList"></div>
     </section>
 
-    <section class="panel">
+    <section class="panel panel-editor">
       <div class="panel-head">
         <div class="editor-toolbar">
           <span>Markdown 编辑区</span>
@@ -426,7 +453,9 @@
       <textarea id="editor" placeholder="# 今天记录\n\n- 学了什么\n- 想了什么\n- 明天做什么\n"></textarea>
     </section>
 
-    <section class="panel">
+    <div class="splitter" id="editorPreviewSplitter" title="拖动调整编辑区 / 预览区宽度"></div>
+
+    <section class="panel panel-preview">
       <div class="panel-head">
         <span>实时预览区（GitHub 风格）</span>
       </div>
@@ -459,6 +488,7 @@
     const exportAllBtn = document.getElementById('exportAllBtn');
     const searchInput = document.getElementById('searchInput');
     const sortSelect = document.getElementById('sortSelect');
+    const editorPreviewSplitter = document.getElementById('editorPreviewSplitter');
 
     const renameBtn = document.getElementById('renameBtn');
     const exportBtn = document.getElementById('exportBtn');
@@ -487,6 +517,7 @@
       selectedTag: '',
       listCollapsed: false,
       sortBy: 'date_desc',
+      editorRatio: 0.5,
       articles: []
     };
 
@@ -536,6 +567,63 @@
       if (expandListBtn) {
         expandListBtn.style.display = collapsed ? '' : 'none';
       }
+    }
+
+    function clampEditorRatio(value) {
+      const n = Number(value);
+      if (!Number.isFinite(n)) return 0.5;
+      return Math.min(0.8, Math.max(0.2, n));
+    }
+
+    function applyEditorPreviewRatio() {
+      const ratio = clampEditorRatio(state.editorRatio);
+      state.editorRatio = ratio;
+      const editorFr = ratio;
+      const previewFr = 1 - ratio;
+      document.documentElement.style.setProperty('--editor-fr', `${editorFr.toFixed(3)}fr`);
+      document.documentElement.style.setProperty('--preview-fr', `${previewFr.toFixed(3)}fr`);
+    }
+
+    function initEditorPreviewSplitter() {
+      if (!editorPreviewSplitter) return;
+      let dragging = false;
+
+      const onMove = (event) => {
+        if (!dragging) return;
+        if (window.innerWidth <= 980) return;
+
+        const layout = document.querySelector('.layout');
+        if (!layout) return;
+
+        const rect = layout.getBoundingClientRect();
+        const listWidth = state.listCollapsed ? 0 : 320;
+        const available = rect.width - listWidth - 10 - 24;
+        if (available <= 200) return;
+
+        let x = event.clientX - rect.left - (state.listCollapsed ? 0 : (listWidth + 12));
+        x = Math.max(available * 0.2, Math.min(available * 0.8, x));
+
+        state.editorRatio = x / available;
+        applyEditorPreviewRatio();
+      };
+
+      const stop = () => {
+        if (!dragging) return;
+        dragging = false;
+        document.body.style.userSelect = '';
+        saveState();
+        window.removeEventListener('mousemove', onMove);
+        window.removeEventListener('mouseup', stop);
+      };
+
+      editorPreviewSplitter.addEventListener('mousedown', (e) => {
+        if (window.innerWidth <= 980) return;
+        dragging = true;
+        document.body.style.userSelect = 'none';
+        e.preventDefault();
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', stop);
+      });
     }
 
     function setListCollapsed(collapsed) {
@@ -1066,7 +1154,7 @@
               version: 1,
               _existsInCloud: false
             };
-            state = { activeId: article.id, search: '', selectedTag: '', listCollapsed: false, sortBy: 'date_desc', articles: [article] };
+            state = { activeId: article.id, search: '', selectedTag: '', listCollapsed: false, sortBy: 'date_desc', editorRatio: 0.5, articles: [article] };
             saveState();
             return;
           }
@@ -1079,6 +1167,7 @@
               selectedTag: parsed.selectedTag || '',
               listCollapsed: Boolean(parsed.listCollapsed),
               sortBy: parsed.sortBy || 'date_desc',
+              editorRatio: clampEditorRatio(parsed.editorRatio ?? 0.5),
               articles: parsed.articles.map(a => ({
                 id: a.id || newId(),
                 title: a.title || '未命名文章',
@@ -1434,6 +1523,7 @@
               selectedTag: parsed.selectedTag || '',
               listCollapsed: Boolean(parsed.listCollapsed),
               sortBy: parsed.sortBy || 'date_desc',
+              editorRatio: clampEditorRatio(parsed.editorRatio ?? 0.5),
               articles: parsed.articles.map(a => ({
                 id: a.id || newId(),
                 title: a.title || '未命名文章',
@@ -1457,6 +1547,7 @@
         }
         searchInput.value = state.search || '';
         sortSelect.value = state.sortBy || 'date_desc';
+        applyEditorPreviewRatio();
         applyListCollapsedUI();
         renderTagFilter();
         renderArticleList();
@@ -1464,7 +1555,9 @@
         saveState();
       }
 
+      applyEditorPreviewRatio();
       applyListCollapsedUI();
+      initEditorPreviewSplitter();
       initSupabaseAuth();
     }
 
