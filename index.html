@@ -3,63 +3,89 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>我的 Blog 记录</title>
+  <title>Joker🤡 Blog🦞</title>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.8.1/github-markdown-light.min.css">
 
   <style>
     :root {
-      --bg: #f3f6fb;
+      --bg: #f2f6ff;
       --card: #ffffff;
-      --line: #d8dee9;
+      --line: #dde6f5;
       --text: #1f2937;
-      --muted: #6b7280;
-      --accent: #2563eb;
-      --accent-soft: #e8f0ff;
+      --muted: #667085;
+      --accent: #3b82f6;
+      --accent-2: #6366f1;
+      --accent-soft: #eef4ff;
       --danger: #dc2626;
       --tag-bg: #eef2ff;
       --tag-text: #3730a3;
-      --shadow: 0 8px 24px rgba(15, 23, 42, 0.07);
       --ok: #059669;
+      --radius: 14px;
+      --radius-sm: 10px;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --shadow-soft: 0 4px 14px rgba(15, 23, 42, 0.06);
     }
 
     * { box-sizing: border-box; }
+
+    html, body { height: 100%; }
 
     body {
       margin: 0;
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
         "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-      background: radial-gradient(1200px 500px at 20% -10%, #eaf2ff, transparent),
-        radial-gradient(1000px 400px at 100% -20%, #e8fff5, transparent),
-        var(--bg);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      background:
+        radial-gradient(1200px 500px at 20% -10%, #e4efff 0%, transparent 65%),
+        radial-gradient(1000px 420px at 100% -20%, #e6fff3 0%, transparent 70%),
+        linear-gradient(180deg, #f7faff 0%, var(--bg) 100%);
     }
 
     header {
-      min-height: 58px;
+      min-height: 60px;
       border-bottom: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(6px);
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(10px);
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      padding: 8px 16px;
+      padding: 10px 16px;
       position: sticky;
       top: 0;
       z-index: 30;
       flex-wrap: wrap;
     }
 
-    .title { font-size: 18px; font-weight: 700; letter-spacing: .2px; }
+    .title {
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: .2px;
+      color: var(--text);
+    }
+
     .hint { color: var(--muted); font-size: 13px; }
 
     .top-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .cloud-status { font-size: 12px; color: var(--muted); }
-    .cloud-status.ok { color: var(--ok); }
+    .cloud-status {
+      font-size: 12px;
+      color: var(--muted);
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #f6f8fd;
+      border: 1px solid #e4eaf7;
+    }
+    .cloud-status.ok {
+      color: var(--ok);
+      background: #ecfdf5;
+      border-color: #b7efd8;
+    }
 
     .layout {
-      height: calc(100vh - 58px);
+      height: calc(100vh - 60px);
       display: grid;
       grid-template-columns: 320px 1fr 1fr;
       gap: 12px;
@@ -67,9 +93,9 @@
     }
 
     .panel {
-      background: var(--card);
+      background: color-mix(in srgb, var(--card) 92%, #edf3ff 8%);
       border: 1px solid var(--line);
-      border-radius: 14px;
+      border-radius: var(--radius);
       box-shadow: var(--shadow);
       overflow: hidden;
       display: flex;
@@ -87,6 +113,7 @@
       align-items: center;
       gap: 8px;
       flex-wrap: wrap;
+      background: linear-gradient(180deg, #fff 0%, #f9fbff 100%);
     }
 
     .toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -95,22 +122,58 @@
       border: 1px solid var(--line);
       background: #fff;
       color: var(--text);
-      border-radius: 10px;
-      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      padding: 6px 11px;
       font-size: 13px;
       cursor: pointer;
-      transition: all .15s ease;
+      transition: all .16s ease;
+      box-shadow: var(--shadow-soft);
     }
-    .btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
-    .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn:hover {
+      border-color: color-mix(in srgb, var(--accent) 65%, white 35%);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+    .btn:active { transform: translateY(0); }
+    .btn:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(59,130,246,.22);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      border-color: transparent;
+    }
     .btn-primary:hover { color: #fff; filter: brightness(1.03); }
     .btn-danger:hover { border-color: var(--danger); color: var(--danger); }
 
     .search-wrap { padding: 10px 10px 0; }
 
+    .search-tools {
+      display: grid;
+      grid-template-columns: 1fr 170px;
+      gap: 8px;
+    }
+
+    select {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      font-size: 13px;
+      outline: none;
+      color: var(--text);
+      background: #fff;
+      cursor: pointer;
+    }
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+    }
+
     input[type="text"], input[type="search"] {
       border: 1px solid var(--line);
-      border-radius: 10px;
+      border-radius: var(--radius-sm);
       padding: 8px 10px;
       font-size: 13px;
       min-width: 160px;
@@ -118,10 +181,11 @@
       width: 100%;
       color: var(--text);
       background: #fff;
+      transition: all .16s ease;
     }
     input[type="text"]:focus, input[type="search"]:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px #e7efff;
+      box-shadow: 0 0 0 3px rgba(59,130,246,.15);
     }
 
     .filter-tags {
@@ -143,11 +207,13 @@
       font-size: 12px;
       cursor: pointer;
       white-space: nowrap;
+      transition: all .16s ease;
     }
+    .chip:hover { transform: translateY(-1px); }
     .chip.active {
-      background: var(--accent);
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
       color: #fff;
-      border-color: var(--accent);
+      border-color: transparent;
     }
 
     .articles { overflow: auto; padding: 8px; }
@@ -155,27 +221,29 @@
     .article-item {
       width: 100%;
       text-align: left;
-      border: 1px solid transparent;
+      border: 1px solid #edf1f8;
       background: #fff;
       padding: 10px;
-      border-radius: 10px;
+      border-radius: 12px;
       cursor: pointer;
       margin-bottom: 8px;
-      transition: all .15s ease;
+      transition: all .16s ease;
+      box-shadow: 0 2px 10px rgba(15,23,42,.04);
     }
     .article-item:hover {
-      border-color: #cbd5e1;
-      background: #f8fbff;
+      border-color: #cfdaf0;
+      background: #fbfdff;
       transform: translateY(-1px);
     }
     .article-item.active {
-      border-color: var(--accent);
+      border-color: #bfd2ff;
       background: var(--accent-soft);
+      box-shadow: 0 6px 16px rgba(59,130,246,.14);
     }
 
     .article-title {
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 650;
       line-height: 1.4;
       margin-bottom: 6px;
       overflow: hidden;
@@ -223,43 +291,84 @@
       resize: none;
       padding: 14px;
       font-size: 15px;
-      line-height: 1.65;
+      line-height: 1.68;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
         "Liberation Mono", "Courier New", monospace;
       color: var(--text);
-      background: #fff;
+      background:
+        linear-gradient(180deg, #fff 0%, #fcfdff 100%);
     }
 
-    .preview-wrap { height: 100%; overflow: auto; padding: 18px; background: #fcfdff; }
+    .preview-wrap {
+      height: 100%;
+      overflow: auto;
+      padding: 18px;
+      background: linear-gradient(180deg, #fafdff 0%, #f6f9ff 100%);
+    }
     .markdown-body {
       max-width: 860px;
       margin: 0 auto;
       background: #fff;
-      padding: 20px;
+      padding: 22px;
       border-radius: 12px;
-      border: 1px solid #edf0f6;
+      border: 1px solid #e9edf6;
+      box-shadow: 0 8px 22px rgba(15,23,42,.06);
     }
 
     .empty { color: var(--muted); padding: 16px; font-size: 13px; }
 
+    #expandListFab {
+      position: fixed;
+      left: 14px;
+      bottom: 14px;
+      z-index: 60;
+      display: none;
+    }
+
+    body.list-collapsed #expandListFab {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    *::-webkit-scrollbar { width: 10px; height: 10px; }
+    *::-webkit-scrollbar-track { background: transparent; }
+    *::-webkit-scrollbar-thumb {
+      background: #d5dfee;
+      border-radius: 999px;
+      border: 2px solid transparent;
+      background-clip: content-box;
+    }
+    *::-webkit-scrollbar-thumb:hover { background: #bdcae2; background-clip: content-box; }
+
     @media (max-width: 1240px) {
       .layout { grid-template-columns: 280px 1fr 1fr; }
+    }
+
+    body.list-collapsed .layout {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    body.list-collapsed .panel-list {
+      display: none;
     }
 
     @media (max-width: 980px) {
       .layout {
         grid-template-columns: 1fr;
         height: auto;
-        min-height: calc(100vh - 58px);
+        min-height: calc(100vh - 60px);
       }
       .panel { min-height: 42vh; }
+      .title { font-size: 17px; }
     }
   </style>
 </head>
 <body>
   <header>
-    <div class="title">我的 Blog（生活 & 学习）</div>
+    <div class="title">Joker🤡 Blog🦞</div>
     <div class="top-right">
+      <button class="btn" id="expandListBtn" style="display:none">☰ 展开文章列表</button>
       <span class="cloud-status" id="cloudStatus">未连接云同步</span>
       <button class="btn" id="loginBtn">GitHub 登录同步</button>
       <button class="btn" id="logoutBtn" style="display:none">退出登录</button>
@@ -268,17 +377,26 @@
   </header>
 
   <main class="layout">
-    <section class="panel">
+    <section class="panel panel-list">
       <div class="panel-head">
         <span>文章列表</span>
         <div class="toolbar">
+          <button class="btn" id="toggleListBtn" title="折叠/展开文章列表">⟨ 收起</button>
           <button class="btn btn-primary" id="newArticleBtn">+ 新建</button>
           <button class="btn" id="exportAllBtn">导出全部 ZIP</button>
         </div>
       </div>
 
       <div class="search-wrap">
-        <input id="searchInput" type="search" placeholder="搜索标题 / 内容 / 标签" />
+        <div class="search-tools">
+          <input id="searchInput" type="search" placeholder="搜索标题 / 内容 / 标签" />
+          <select id="sortSelect" title="文章排序方式">
+            <option value="date_desc">按日期（最新优先）</option>
+            <option value="date_asc">按日期（最早优先）</option>
+            <option value="name_asc">按名称（A-Z）</option>
+            <option value="name_desc">按名称（Z-A）</option>
+          </select>
+        </div>
       </div>
 
       <div class="filter-tags" id="tagFilterWrap"></div>
@@ -293,8 +411,10 @@
           <button class="btn" id="renameBtn">改名</button>
           <button class="btn" id="exportBtn">导出 .md</button>
           <button class="btn" id="importBtn">导入 .md</button>
+          <button class="btn" id="uploadImageBtn" title="上传图片到 Supabase Storage 并插入 Markdown">上传图片</button>
           <button class="btn btn-danger" id="deleteBtn">删除</button>
           <input id="importFileInput" type="file" accept=".md,text/markdown" style="display:none" />
+          <input id="imageFileInput" type="file" accept="image/*" style="display:none" />
         </div>
 
         <div class="tags-input-wrap">
@@ -316,6 +436,8 @@
     </section>
   </main>
 
+  <button class="btn btn-primary" id="expandListFab" title="展开文章列表">☰ 展开文章列表</button>
+
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -330,14 +452,20 @@
 
     const articleListEl = document.getElementById('articleList');
     const tagFilterWrap = document.getElementById('tagFilterWrap');
+    const toggleListBtn = document.getElementById('toggleListBtn');
+    const expandListBtn = document.getElementById('expandListBtn');
+    const expandListFab = document.getElementById('expandListFab');
     const newArticleBtn = document.getElementById('newArticleBtn');
     const exportAllBtn = document.getElementById('exportAllBtn');
     const searchInput = document.getElementById('searchInput');
+    const sortSelect = document.getElementById('sortSelect');
 
     const renameBtn = document.getElementById('renameBtn');
     const exportBtn = document.getElementById('exportBtn');
     const importBtn = document.getElementById('importBtn');
+    const uploadImageBtn = document.getElementById('uploadImageBtn');
     const importFileInput = document.getElementById('importFileInput');
+    const imageFileInput = document.getElementById('imageFileInput');
     const deleteBtn = document.getElementById('deleteBtn');
     const titleInput = document.getElementById('titleInput');
     const tagsInput = document.getElementById('tagsInput');
@@ -357,6 +485,8 @@
       activeId: null,
       search: '',
       selectedTag: '',
+      listCollapsed: false,
+      sortBy: 'date_desc',
       articles: []
     };
 
@@ -364,6 +494,9 @@
     let currentUser = null;
     let cloudPushTimer = null;
     let suppressCloudPush = false;
+    let imageUploading = false;
+
+    const IMAGE_BUCKET = 'blog-images';
 
     function now() { return new Date().toISOString(); }
     function newId() {
@@ -390,6 +523,23 @@
     function setCloudStatus(text, ok = false) {
       cloudStatus.textContent = text;
       cloudStatus.classList.toggle('ok', ok);
+    }
+
+    function applyListCollapsedUI() {
+      const collapsed = Boolean(state.listCollapsed);
+      document.body.classList.toggle('list-collapsed', collapsed);
+      if (toggleListBtn) {
+        toggleListBtn.textContent = collapsed ? '⟩ 展开' : '⟨ 收起';
+      }
+      if (expandListBtn) {
+        expandListBtn.style.display = collapsed ? '' : 'none';
+      }
+    }
+
+    function setListCollapsed(collapsed) {
+      state.listCollapsed = Boolean(collapsed);
+      applyListCollapsedUI();
+      saveState();
     }
 
     function saveState() {
@@ -419,6 +569,101 @@
       return (base || 'untitled').slice(0, 80);
     }
 
+    function getFileExt(name, fallback = 'png') {
+      const m = String(name || '').toLowerCase().match(/\.([a-z0-9]+)$/);
+      return m ? m[1] : fallback;
+    }
+
+    function insertTextAtCursor(el, text) {
+      const start = el.selectionStart ?? el.value.length;
+      const end = el.selectionEnd ?? el.value.length;
+      const before = el.value.slice(0, start);
+      const after = el.value.slice(end);
+      el.value = before + text + after;
+      const next = start + text.length;
+      el.selectionStart = el.selectionEnd = next;
+      el.focus();
+    }
+
+    function uniqueImagePath(file) {
+      const uid = currentUser?.id || 'anonymous';
+      const articleId = state.activeId || 'general';
+      const datePart = new Date().toISOString().slice(0, 10);
+      const ext = getFileExt(file?.name || '', 'png');
+      const rand = Math.random().toString(36).slice(2, 10);
+      return `${uid}/${datePart}/${articleId}/${Date.now()}_${rand}.${ext}`;
+    }
+
+    async function uploadImageAndInsert(file, source = 'upload') {
+      const a = activeArticle();
+      if (!a) {
+        alert('请先选择或新建一篇文章，再插入图片');
+        return;
+      }
+      if (!file) return;
+      if (!supabaseClient || !currentUser) {
+        alert('请先 GitHub 登录，再上传图片到云端');
+        return;
+      }
+      if (!String(file.type || '').startsWith('image/')) {
+        alert('仅支持图片文件');
+        return;
+      }
+      if (imageUploading) {
+        setStatus('已有图片在上传，请稍候...');
+        return;
+      }
+
+      imageUploading = true;
+      const oldBtnText = uploadImageBtn ? uploadImageBtn.textContent : '';
+      if (uploadImageBtn) {
+        uploadImageBtn.disabled = true;
+        uploadImageBtn.textContent = '上传中...';
+      }
+
+      try {
+        setStatus(source === 'paste' ? '正在上传粘贴图片...' : '正在上传图片...');
+        const path = uniqueImagePath(file);
+        const { error: upErr } = await supabaseClient.storage
+          .from(IMAGE_BUCKET)
+          .upload(path, file, {
+            contentType: file.type || 'image/png',
+            upsert: false
+          });
+
+        if (upErr) {
+          throw new Error(upErr.message || '上传失败');
+        }
+
+        const { data: pub } = supabaseClient.storage.from(IMAGE_BUCKET).getPublicUrl(path);
+        const url = pub?.publicUrl;
+        if (!url) {
+          throw new Error('无法获取图片地址，请检查 bucket 是否公开可读');
+        }
+
+        const alt = sanitizeFilename(file.name || 'image');
+        const md = `\n![${alt}](${url})\n`;
+        insertTextAtCursor(editor, md);
+
+        a.content = editor.value;
+        a.updatedAt = now();
+        renderPreview(a.content);
+        renderArticleList();
+        saveState();
+        setStatus('图片上传成功并已插入 · ' + new Date().toLocaleTimeString());
+      } catch (err) {
+        console.error(err);
+        alert(`图片上传失败：${err?.message || err}\n\n请确认：\n1) 已登录 GitHub\n2) Supabase Storage 存在 bucket: ${IMAGE_BUCKET}\n3) 该 bucket 允许读取（Public）或已配置可访问策略`);
+        setStatus('图片上传失败');
+      } finally {
+        imageUploading = false;
+        if (uploadImageBtn) {
+          uploadImageBtn.disabled = false;
+          uploadImageBtn.textContent = oldBtnText || '上传图片';
+        }
+      }
+    }
+
     function parseTags(raw) {
       return Array.from(new Set((raw || '')
         .split(',')
@@ -436,8 +681,18 @@
       const q = (state.search || '').trim().toLowerCase();
       const selectedTag = state.selectedTag;
 
-      const list = [...state.articles]
-        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+      const list = [...state.articles];
+      const sortBy = state.sortBy || 'date_desc';
+
+      if (sortBy === 'date_asc') {
+        list.sort((a, b) => new Date(a.updatedAt) - new Date(b.updatedAt));
+      } else if (sortBy === 'name_asc') {
+        list.sort((a, b) => (a.title || '').localeCompare((b.title || ''), 'zh-CN'));
+      } else if (sortBy === 'name_desc') {
+        list.sort((a, b) => (b.title || '').localeCompare((a.title || ''), 'zh-CN'));
+      } else {
+        list.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+      }
 
       return list.filter(a => {
         const tags = a.tags || [];
@@ -534,7 +789,9 @@
         tags: [],
         content: state.articles.length ? '' : defaultContent(),
         createdAt: t,
-        updatedAt: t
+        updatedAt: t,
+        version: 1,
+        _existsInCloud: false
       };
       state.articles.push(article);
       state.activeId = article.id;
@@ -688,7 +945,9 @@
           tags: [],
           content: text,
           createdAt: t,
-          updatedAt: t
+          updatedAt: t,
+          version: 1,
+          _existsInCloud: false
         };
         state.articles.push(article);
         state.activeId = article.id;
@@ -719,9 +978,11 @@
               tags: [],
               content: raw,
               createdAt: t,
-              updatedAt: t
+              updatedAt: t,
+              version: 1,
+              _existsInCloud: false
             };
-            state = { activeId: article.id, search: '', selectedTag: '', articles: [article] };
+            state = { activeId: article.id, search: '', selectedTag: '', listCollapsed: false, sortBy: 'date_desc', articles: [article] };
             saveState();
             return;
           }
@@ -732,13 +993,17 @@
               activeId: parsed.activeId || parsed.articles[0]?.id || null,
               search: parsed.search || '',
               selectedTag: parsed.selectedTag || '',
+              listCollapsed: Boolean(parsed.listCollapsed),
+              sortBy: parsed.sortBy || 'date_desc',
               articles: parsed.articles.map(a => ({
                 id: a.id || newId(),
                 title: a.title || '未命名文章',
                 tags: Array.isArray(a.tags) ? a.tags : [],
                 content: a.content || '',
                 createdAt: a.createdAt || now(),
-                updatedAt: a.updatedAt || now()
+                updatedAt: a.updatedAt || now(),
+                version: Number.isFinite(Number(a.version)) ? Number(a.version) : 1,
+                _existsInCloud: Boolean(a._existsInCloud)
               }))
             };
             saveState();
@@ -793,11 +1058,158 @@
           map.set(a.id, a);
           return;
         }
+
+        const oldVersion = Number(old.version || 1);
+        const newVersion = Number(a.version || 1);
+
+        if (newVersion !== oldVersion) {
+          map.set(a.id, newVersion > oldVersion ? a : old);
+          return;
+        }
+
         const oldTime = new Date(old.updatedAt).getTime();
         const newTime = new Date(a.updatedAt).getTime();
         map.set(a.id, newTime >= oldTime ? a : old);
       });
       return [...map.values()].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    }
+
+    function showConflictPrompt() {
+      const msg = '检测到云端版本已更新（另一端可能刚修改）。\n请选择：\nA=覆盖云端（以当前本地为准）\nB=加载云端最新（放弃当前本地改动）\nC=取消（我手动合并）';
+      const pick = prompt(msg, 'C');
+      return (pick || 'C').trim().toUpperCase();
+    }
+
+    async function getCloudArticleById(id) {
+      if (!supabaseClient || !currentUser) return null;
+      const { data, error } = await supabaseClient
+        .from('blog_articles')
+        .select('id,title,content,tags,created_at,updated_at,version')
+        .eq('id', id)
+        .eq('user_id', currentUser.id)
+        .maybeSingle();
+      if (error) {
+        console.error(error);
+        return null;
+      }
+      if (!data) return null;
+      return {
+        id: data.id,
+        title: data.title || '未命名文章',
+        content: data.content || '',
+        tags: Array.isArray(data.tags) ? data.tags : [],
+        createdAt: data.created_at || now(),
+        updatedAt: data.updated_at || now(),
+        version: Number(data.version || 1),
+        _existsInCloud: true
+      };
+    }
+
+    async function forceOverwriteCloudArticle(localArticle) {
+      const remote = await getCloudArticleById(localArticle.id);
+      const nextVersion = (remote?.version || localArticle.version || 1) + 1;
+      const updatedAt = now();
+
+      const { data, error } = await supabaseClient
+        .from('blog_articles')
+        .upsert({
+          id: localArticle.id,
+          user_id: currentUser.id,
+          title: localArticle.title || '',
+          content: localArticle.content || '',
+          tags: Array.isArray(localArticle.tags) ? localArticle.tags : [],
+          created_at: localArticle.createdAt || updatedAt,
+          updated_at: updatedAt,
+          version: nextVersion
+        }, { onConflict: 'id' })
+        .select('version,updated_at')
+        .single();
+
+      if (error) {
+        console.error(error);
+        return false;
+      }
+
+      localArticle.version = Number(data.version || nextVersion);
+      localArticle.updatedAt = data.updated_at || updatedAt;
+      localArticle._existsInCloud = true;
+      return true;
+    }
+
+    async function saveOneArticleWithLock(article, { conflictPolicy = 'ask' } = {}) {
+      if (!supabaseClient || !currentUser) return { ok: false, reason: 'offline' };
+
+      if (!article._existsInCloud) {
+        const { data, error } = await supabaseClient
+          .from('blog_articles')
+          .insert({
+            id: article.id,
+            user_id: currentUser.id,
+            title: article.title || '',
+            content: article.content || '',
+            tags: Array.isArray(article.tags) ? article.tags : [],
+            created_at: article.createdAt || now(),
+            updated_at: article.updatedAt || now(),
+            version: Number(article.version || 1)
+          })
+          .select('version,updated_at')
+          .single();
+
+        if (error) {
+          if (error.code === '23505') {
+            article._existsInCloud = true;
+            return { conflict: true, reason: 'already_exists' };
+          }
+          return { ok: false, error };
+        }
+
+        article.version = Number(data.version || 1);
+        article.updatedAt = data.updated_at || article.updatedAt || now();
+        article._existsInCloud = true;
+        return { ok: true };
+      }
+
+      const expectedVersion = Number(article.version || 1);
+      const proposedVersion = expectedVersion + 1;
+      const proposedUpdatedAt = now();
+
+      const { data, error } = await supabaseClient
+        .from('blog_articles')
+        .update({
+          title: article.title || '',
+          content: article.content || '',
+          tags: Array.isArray(article.tags) ? article.tags : [],
+          updated_at: proposedUpdatedAt,
+          version: proposedVersion
+        })
+        .eq('id', article.id)
+        .eq('user_id', currentUser.id)
+        .eq('version', expectedVersion)
+        .select('version,updated_at')
+        .maybeSingle();
+
+      if (error) return { ok: false, error };
+
+      if (!data) {
+        if (conflictPolicy === 'overwrite') {
+          const ok = await forceOverwriteCloudArticle(article);
+          return ok ? { ok: true, forced: true } : { ok: false, reason: 'force_failed' };
+        }
+        if (conflictPolicy === 'load_remote') {
+          const remote = await getCloudArticleById(article.id);
+          if (remote) {
+            Object.assign(article, remote);
+            return { conflict: true, resolvedBy: 'remote_loaded' };
+          }
+          return { ok: false, reason: 'remote_missing' };
+        }
+        return { conflict: true, reason: 'version_mismatch' };
+      }
+
+      article.version = Number(data.version || proposedVersion);
+      article.updatedAt = data.updated_at || proposedUpdatedAt;
+      article._existsInCloud = true;
+      return { ok: true };
     }
 
     async function pullFromCloudAndMerge() {
@@ -806,7 +1218,7 @@
 
       const { data, error } = await supabaseClient
         .from('blog_articles')
-        .select('id,title,content,tags,created_at,updated_at')
+        .select('id,title,content,tags,created_at,updated_at,version')
         .eq('user_id', currentUser.id)
         .order('updated_at', { ascending: false });
 
@@ -822,10 +1234,19 @@
         content: r.content || '',
         tags: Array.isArray(r.tags) ? r.tags : [],
         createdAt: r.created_at || now(),
-        updatedAt: r.updated_at || now()
+        updatedAt: r.updated_at || now(),
+        version: Number(r.version || 1),
+        _existsInCloud: true
       }));
 
-      const merged = mergeArticles(state.articles, cloud);
+      const merged = mergeArticles(state.articles, cloud).map(a => {
+        const inCloud = cloud.find(c => c.id === a.id);
+        return {
+          ...a,
+          version: Number(a.version || 1),
+          _existsInCloud: Boolean(inCloud || a._existsInCloud)
+        };
+      });
 
       suppressCloudPush = true;
       state.articles = merged;
@@ -852,26 +1273,47 @@
       if (!supabaseClient || !currentUser) return;
       if (!state.articles.length) return;
 
-      const rows = state.articles.map(a => ({
-        id: a.id,
-        user_id: currentUser.id,
-        title: a.title || '',
-        content: a.content || '',
-        tags: Array.isArray(a.tags) ? a.tags : [],
-        created_at: a.createdAt || now(),
-        updated_at: a.updatedAt || now()
-      }));
+      for (const article of state.articles) {
+        const result = await saveOneArticleWithLock(article);
 
-      const { error } = await supabaseClient
-        .from('blog_articles')
-        .upsert(rows, { onConflict: 'id' });
+        if (result?.conflict) {
+          const action = showConflictPrompt();
 
-      if (error) {
-        setCloudStatus('云同步失败，请检查RLS', false);
-        console.error(error);
-      } else {
-        setCloudStatus('云同步已连接', true);
+          if (action === 'A') {
+            const forced = await saveOneArticleWithLock(article, { conflictPolicy: 'overwrite' });
+            if (!forced?.ok) {
+              setCloudStatus('冲突覆盖失败', false);
+              console.error(forced);
+              return;
+            }
+            setStatus('检测到冲突：已按本地覆盖云端');
+          } else if (action === 'B') {
+            const loaded = await saveOneArticleWithLock(article, { conflictPolicy: 'load_remote' });
+            if (loaded?.resolvedBy === 'remote_loaded') {
+              renderTagFilter();
+              renderArticleList();
+              renderEditor();
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+              setStatus('检测到冲突：已载入云端最新');
+            } else {
+              setCloudStatus('冲突处理失败', false);
+              console.error(loaded);
+              return;
+            }
+          } else {
+            setCloudStatus('检测到冲突（已暂停自动同步）', false);
+            alert('检测到冲突，已暂停本次自动同步。请手动合并后再继续编辑。');
+            return;
+          }
+        } else if (!result?.ok) {
+          setCloudStatus('云同步失败，请检查RLS', false);
+          console.error(result?.error || result);
+          return;
+        }
       }
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      setCloudStatus('云同步已连接', true);
     }
 
     async function signInWithGithub() {
@@ -906,13 +1348,17 @@
               activeId: parsed.activeId || null,
               search: parsed.search || '',
               selectedTag: parsed.selectedTag || '',
+              listCollapsed: Boolean(parsed.listCollapsed),
+              sortBy: parsed.sortBy || 'date_desc',
               articles: parsed.articles.map(a => ({
                 id: a.id || newId(),
                 title: a.title || '未命名文章',
                 content: a.content || '',
                 tags: Array.isArray(a.tags) ? a.tags : [],
                 createdAt: a.createdAt || now(),
-                updatedAt: a.updatedAt || now()
+                updatedAt: a.updatedAt || now(),
+                version: Number.isFinite(Number(a.version)) ? Number(a.version) : 1,
+                _existsInCloud: Boolean(a._existsInCloud)
               }))
             };
           }
@@ -926,12 +1372,15 @@
           state.activeId = state.articles[0].id;
         }
         searchInput.value = state.search || '';
+        sortSelect.value = state.sortBy || 'date_desc';
+        applyListCollapsedUI();
         renderTagFilter();
         renderArticleList();
         renderEditor();
         saveState();
       }
 
+      applyListCollapsedUI();
       initSupabaseAuth();
     }
 
@@ -958,6 +1407,24 @@
       saveState();
     });
 
+    sortSelect?.addEventListener('change', () => {
+      state.sortBy = sortSelect.value || 'date_desc';
+      renderArticleList();
+      saveState();
+    });
+
+    toggleListBtn?.addEventListener('click', () => {
+      setListCollapsed(!state.listCollapsed);
+    });
+
+    expandListBtn?.addEventListener('click', () => {
+      setListCollapsed(false);
+    });
+
+    expandListFab?.addEventListener('click', () => {
+      setListCollapsed(false);
+    });
+
     newArticleBtn.addEventListener('click', () => {
       const title = prompt('新文章标题（可留空）', '新文章');
       createArticle((title || '新文章').trim() || '新文章');
@@ -971,6 +1438,31 @@
     importBtn.addEventListener('click', () => {
       importFileInput.value = '';
       importFileInput.click();
+    });
+
+    uploadImageBtn?.addEventListener('click', () => {
+      imageFileInput.value = '';
+      imageFileInput.click();
+    });
+
+    imageFileInput?.addEventListener('change', async () => {
+      const file = imageFileInput.files && imageFileInput.files[0];
+      if (!file) return;
+      await uploadImageAndInsert(file, 'upload');
+    });
+
+    editor.addEventListener('paste', async (e) => {
+      const items = e.clipboardData?.items || [];
+      for (const item of items) {
+        if (item.kind === 'file' && String(item.type || '').startsWith('image/')) {
+          e.preventDefault();
+          const file = item.getAsFile();
+          if (file) {
+            await uploadImageAndInsert(file, 'paste');
+          }
+          return;
+        }
+      }
     });
 
     importFileInput.addEventListener('change', () => {
