@@ -497,6 +497,8 @@
     let imageUploading = false;
 
     const IMAGE_BUCKET = 'blog-images';
+    const IMAGE_MAX_EDGE = 1920;
+    const IMAGE_WEBP_QUALITY = 0.82;
 
     function now() { return new Date().toISOString(); }
     function newId() {
@@ -574,6 +576,81 @@
       return m ? m[1] : fallback;
     }
 
+    function formatBytes(bytes) {
+      const n = Number(bytes || 0);
+      if (n < 1024) return `${n} B`;
+      if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+      return `${(n / (1024 * 1024)).toFixed(2)} MB`;
+    }
+
+    function loadImageFromFile(file) {
+      return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          resolve(img);
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(url);
+          reject(new Error('图片解码失败'));
+        };
+        img.src = url;
+      });
+    }
+
+    function canvasToBlob(canvas, type, quality) {
+      return new Promise((resolve, reject) => {
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            reject(new Error('图片编码失败'));
+            return;
+          }
+          resolve(blob);
+        }, type, quality);
+      });
+    }
+
+    async function normalizeImageForUpload(file) {
+      const img = await loadImageFromFile(file);
+      const ow = img.naturalWidth || img.width;
+      const oh = img.naturalHeight || img.height;
+
+      const scale = Math.min(1, IMAGE_MAX_EDGE / Math.max(ow, oh));
+      const tw = Math.max(1, Math.round(ow * scale));
+      const th = Math.max(1, Math.round(oh * scale));
+
+      const canvas = document.createElement('canvas');
+      canvas.width = tw;
+      canvas.height = th;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, tw, th);
+
+      let blob;
+      let mimeType = 'image/webp';
+      let ext = 'webp';
+
+      try {
+        blob = await canvasToBlob(canvas, 'image/webp', IMAGE_WEBP_QUALITY);
+      } catch (_) {
+        mimeType = 'image/jpeg';
+        ext = 'jpg';
+        blob = await canvasToBlob(canvas, 'image/jpeg', 0.85);
+      }
+
+      const base = sanitizeFilename((file.name || 'image').replace(/\.[^.]+$/, ''));
+      const normalizedName = `${base}.${ext}`;
+
+      return {
+        blob,
+        mimeType,
+        fileName: normalizedName,
+        ext,
+        originalBytes: Number(file.size || 0),
+        processedBytes: Number(blob.size || 0)
+      };
+    }
+
     function insertTextAtCursor(el, text) {
       const start = el.selectionStart ?? el.value.length;
       const end = el.selectionEnd ?? el.value.length;
@@ -622,12 +699,16 @@
       }
 
       try {
-        setStatus(source === 'paste' ? '正在上传粘贴图片...' : '正在上传图片...');
-        const path = uniqueImagePath(file);
+        setStatus(source === 'paste' ? '正在压缩并上传粘贴图片...' : '正在压缩并上传图片...');
+
+        const normalized = await normalizeImageForUpload(file);
+        const wrappedFile = new File([normalized.blob], normalized.fileName, { type: normalized.mimeType });
+
+        const path = uniqueImagePath(wrappedFile);
         const { error: upErr } = await supabaseClient.storage
           .from(IMAGE_BUCKET)
-          .upload(path, file, {
-            contentType: file.type || 'image/png',
+          .upload(path, wrappedFile, {
+            contentType: normalized.mimeType,
             upsert: false
           });
 
@@ -641,7 +722,7 @@
           throw new Error('无法获取图片地址，请检查 bucket 是否公开可读');
         }
 
-        const alt = sanitizeFilename(file.name || 'image');
+        const alt = sanitizeFilename((file.name || 'image').replace(/\.[^.]+$/, ''));
         const md = `\n![${alt}](${url})\n`;
         insertTextAtCursor(editor, md);
 
@@ -650,7 +731,10 @@
         renderPreview(a.content);
         renderArticleList();
         saveState();
-        setStatus('图片上传成功并已插入 · ' + new Date().toLocaleTimeString());
+
+        const before = formatBytes(normalized.originalBytes);
+        const after = formatBytes(normalized.processedBytes);
+        setStatus(`图片已上传并插入（${before} → ${after}）· ${new Date().toLocaleTimeString()}`);
       } catch (err) {
         console.error(err);
         alert(`图片上传失败：${err?.message || err}\n\n请确认：\n1) 已登录 GitHub\n2) Supabase Storage 存在 bucket: ${IMAGE_BUCKET}\n3) 该 bucket 允许读取（Public）或已配置可访问策略`);
