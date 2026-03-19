@@ -142,6 +142,49 @@
       background: linear-gradient(180deg, #fff 0%, #f9fbff 100%);
     }
 
+    .list-head {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+    }
+
+    .list-head-top,
+    .list-head-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .list-head-top > span {
+      font-size: 14px;
+      color: #475467;
+      font-weight: 600;
+    }
+
+    .list-head-actions {
+      padding-top: 6px;
+      border-top: 1px dashed #e5ebf6;
+      justify-content: space-between;
+    }
+
+    .list-head-actions-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .list-head-actions .btn {
+      background: #f8faff;
+    }
+
+    #exportAllBtn {
+      border-style: dashed;
+    }
+
     .toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
     .btn {
@@ -176,10 +219,44 @@
 
     .search-wrap { padding: 10px 10px 0; }
 
+    #searchToggleBtn {
+      min-width: 34px;
+      padding: 6px 9px;
+      font-size: 15px;
+      line-height: 1;
+    }
+
+    .search-wrap {
+      margin: 0 10px 8px;
+      padding: 10px;
+      border: 1px solid #e7edf8;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #ffffff, #f9fbff);
+    }
+
+    body.search-collapsed .search-wrap {
+      display: none;
+    }
+
     .search-tools {
-      display: grid;
-      grid-template-columns: 1fr 170px;
+      display: flex;
+      flex-direction: column;
       gap: 8px;
+    }
+
+    .field-inline {
+      display: grid;
+      grid-template-columns: 78px 1fr;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .field-inline > span {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: right;
+      white-space: nowrap;
+      font-weight: 600;
     }
 
     select {
@@ -293,6 +370,22 @@
       padding: 1px 7px;
     }
 
+    .plan-pill {
+      font-size: 11px;
+      color: #0f3d8a;
+      background: #e8f0ff;
+      border: 1px solid #c7d7ff;
+      border-radius: 999px;
+      padding: 1px 7px;
+      margin-right: 6px;
+    }
+
+    .article-progress {
+      font-size: 12px;
+      color: #4b5563;
+      margin-top: 4px;
+    }
+
     .editor-toolbar {
       display: flex;
       align-items: center;
@@ -301,12 +394,20 @@
       width: 100%;
     }
 
+    .editor-toolbar > span {
+      font-weight: 600;
+      color: #475467;
+      margin-right: 2px;
+    }
+
     .tags-input-wrap {
       display: grid;
       grid-template-columns: 1fr auto;
       gap: 8px;
       width: 100%;
       margin-top: 6px;
+      padding-top: 8px;
+      border-top: 1px dashed #e7edf8;
     }
 
     textarea {
@@ -369,6 +470,9 @@
 
     @media (max-width: 1240px) {
       .layout { grid-template-columns: 280px minmax(320px, var(--editor-fr, 1fr)) 10px minmax(320px, var(--preview-fr, 1fr)); }
+      .field-inline { grid-template-columns: 62px 1fr; }
+      .list-head-top,
+      .list-head-actions { justify-content: flex-start; }
     }
 
     body.list-collapsed .layout {
@@ -385,6 +489,10 @@
         height: auto;
         min-height: calc(100vh - 60px);
       }
+      .field-inline { grid-template-columns: 1fr; }
+      .field-inline > span { text-align: left; }
+      .list-head-actions { border-top: 0; padding-top: 0; }
+      .tags-input-wrap { grid-template-columns: 1fr; }
       .splitter { display: none; }
       .panel { min-height: 42vh; }
       .title { font-size: 17px; }
@@ -405,24 +513,47 @@
 
   <main class="layout">
     <section class="panel panel-list">
-      <div class="panel-head">
-        <span>文章列表</span>
-        <div class="toolbar">
-          <button class="btn" id="toggleListBtn" title="折叠/展开文章列表">⟨ 收起</button>
-          <button class="btn btn-primary" id="newArticleBtn">+ 新建</button>
-          <button class="btn" id="exportAllBtn">导出全部 ZIP</button>
+      <div class="panel-head list-head">
+        <div class="list-head-top">
+          <span>文章列表</span>
+          <button class="btn btn-primary" id="newArticleBtn">+ 新建计划/文章</button>
+        </div>
+        <div class="list-head-actions">
+          <div class="list-head-actions-left">
+            <button class="btn" id="toggleListBtn" title="折叠/展开文章列表">⟨ 侧栏</button>
+            <button class="btn" id="searchToggleBtn" title="展开/收起搜索筛选">🔎 搜索</button>
+          </div>
+          <button class="btn" id="exportAllBtn">⤓ 导出 ZIP</button>
         </div>
       </div>
 
       <div class="search-wrap">
         <div class="search-tools">
-          <input id="searchInput" type="search" placeholder="搜索标题 / 内容 / 标签" />
-          <select id="sortSelect" title="文章排序方式">
-            <option value="date_desc">按日期（最新优先）</option>
-            <option value="date_asc">按日期（最早优先）</option>
-            <option value="name_asc">按名称（A-Z）</option>
-            <option value="name_desc">按名称（Z-A）</option>
-          </select>
+          <div class="field-inline">
+            <span>搜索</span>
+            <input id="searchInput" type="search" placeholder="搜索标题 / 内容 / 标签" />
+          </div>
+
+          <div class="field-inline">
+            <span>类型</span>
+            <select id="planFilterSelect" title="计划类型筛选">
+              <option value="all">全部类型</option>
+              <option value="daily">日计划</option>
+              <option value="weekly">周计划</option>
+              <option value="monthly">月计划</option>
+              <option value="normal">普通文章</option>
+            </select>
+          </div>
+
+          <div class="field-inline">
+            <span>排序</span>
+            <select id="sortSelect" title="文章排序方式">
+              <option value="date_desc">按日期（最新优先）</option>
+              <option value="date_asc">按日期（最早优先）</option>
+              <option value="name_asc">按名称（A-Z）</option>
+              <option value="name_desc">按名称（Z-A）</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -438,6 +569,7 @@
           <button class="btn" id="renameBtn">改名</button>
           <button class="btn" id="exportBtn">导出 .md</button>
           <button class="btn" id="importBtn">导入 .md</button>
+          <button class="btn" id="readPageBtn" title="在新页面阅读全文">网页阅读</button>
           <button class="btn" id="uploadImageBtn" title="上传图片到 Supabase Storage 并插入 Markdown">上传图片</button>
           <button class="btn btn-danger" id="deleteBtn">删除</button>
           <input id="importFileInput" type="file" accept=".md,text/markdown" style="display:none" />
@@ -482,17 +614,20 @@
     const articleListEl = document.getElementById('articleList');
     const tagFilterWrap = document.getElementById('tagFilterWrap');
     const toggleListBtn = document.getElementById('toggleListBtn');
+    const searchToggleBtn = document.getElementById('searchToggleBtn');
     const expandListBtn = document.getElementById('expandListBtn');
     const expandListFab = document.getElementById('expandListFab');
     const newArticleBtn = document.getElementById('newArticleBtn');
     const exportAllBtn = document.getElementById('exportAllBtn');
     const searchInput = document.getElementById('searchInput');
+    const planFilterSelect = document.getElementById('planFilterSelect');
     const sortSelect = document.getElementById('sortSelect');
     const editorPreviewSplitter = document.getElementById('editorPreviewSplitter');
 
     const renameBtn = document.getElementById('renameBtn');
     const exportBtn = document.getElementById('exportBtn');
     const importBtn = document.getElementById('importBtn');
+    const readPageBtn = document.getElementById('readPageBtn');
     const uploadImageBtn = document.getElementById('uploadImageBtn');
     const importFileInput = document.getElementById('importFileInput');
     const imageFileInput = document.getElementById('imageFileInput');
@@ -517,6 +652,8 @@
       selectedTag: '',
       listCollapsed: false,
       sortBy: 'date_desc',
+      planFilter: 'all',
+      searchCollapsed: true,
       editorRatio: 0.5,
       articles: []
     };
@@ -562,11 +699,26 @@
       const collapsed = Boolean(state.listCollapsed);
       document.body.classList.toggle('list-collapsed', collapsed);
       if (toggleListBtn) {
-        toggleListBtn.textContent = collapsed ? '⟩ 展开' : '⟨ 收起';
+        toggleListBtn.textContent = collapsed ? '⟩ 展开侧栏' : '⟨ 收起侧栏';
       }
       if (expandListBtn) {
         expandListBtn.style.display = collapsed ? '' : 'none';
       }
+    }
+
+    function applySearchCollapsedUI() {
+      const collapsed = Boolean(state.searchCollapsed);
+      document.body.classList.toggle('search-collapsed', collapsed);
+      if (searchToggleBtn) {
+        searchToggleBtn.textContent = collapsed ? '🔎' : '✕';
+        searchToggleBtn.title = collapsed ? '展开搜索筛选' : '收起搜索筛选';
+      }
+    }
+
+    function setSearchCollapsed(collapsed) {
+      state.searchCollapsed = Boolean(collapsed);
+      applySearchCollapsedUI();
+      saveState();
     }
 
     function clampEditorRatio(value) {
@@ -640,6 +792,82 @@
 
     function renderPreview(md) {
       preview.innerHTML = marked.parse(md || '');
+    }
+
+    function openReadPage() {
+      const a = activeArticle();
+      if (!a) {
+        alert('当前没有可阅读的文章');
+        return;
+      }
+
+      const html = `<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${escapeHtml(a.title || '未命名文章')} - Joker🤡 Blog🦞</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.8.1/github-markdown-light.min.css">
+  <style>
+    body {
+      margin: 0;
+      background: #f6f8fc;
+      color: #1f2937;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    .wrap {
+      max-width: 920px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+    .article {
+      background: #fff;
+      border: 1px solid #e7edf6;
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+    }
+    .meta {
+      color: #667085;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    .tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin: 6px 0 14px;
+    }
+    .tag {
+      font-size: 12px;
+      border-radius: 999px;
+      border: 1px solid #dbe4ff;
+      background: #eef2ff;
+      color: #3730a3;
+      padding: 2px 9px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <article class="article markdown-body">
+      <h1>${escapeHtml(a.title || '未命名文章')}</h1>
+      <div class="meta">更新于 ${escapeHtml(formatTime(a.updatedAt || now()))}</div>
+      <div class="tags">${(a.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
+      ${marked.parse(a.content || '')}
+    </article>
+  </div>
+</body>
+</html>`;
+
+      const win = window.open('', '_blank');
+      if (!win) {
+        alert('浏览器阻止了新窗口，请允许弹窗后重试');
+        return;
+      }
+      win.document.open();
+      win.document.write(html);
+      win.document.close();
     }
 
     function escapeHtml(str) {
@@ -849,9 +1077,56 @@
       return Array.from(set).sort((a, b) => a.localeCompare(b, 'zh-CN'));
     }
 
+    function planTypeLabel(type) {
+      if (type === 'daily') return '日计划';
+      if (type === 'weekly') return '周计划';
+      if (type === 'monthly') return '月计划';
+      return '普通文章';
+    }
+
+    function detectPlanProgress(markdown = '') {
+      const all = (markdown.match(/- \[[ xX]\]/g) || []).length;
+      const done = (markdown.match(/- \[[xX]\]/g) || []).length;
+      if (!all) return null;
+      const rate = Math.round((done / all) * 100);
+      return { done, all, rate };
+    }
+
+    function todayDateStr() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function weekStr(d = new Date()) {
+      const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+      const day = date.getUTCDay() || 7;
+      date.setUTCDate(date.getUTCDate() + 4 - day);
+      const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+      const weekNo = Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+      return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
+    }
+
+    function monthStr() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    }
+
+    function buildPlanTemplate(type, mark) {
+      if (type === 'daily') {
+        return `# 日计划｜${mark}\n\n## 今日三件最重要的事（MIT）\n- [ ] \n- [ ] \n- [ ] \n\n## 时间安排\n- 上午：\n- 下午：\n- 晚上：\n\n## 复盘\n- 完成：\n- 未完成：\n- 明日调整：`;
+      }
+      if (type === 'weekly') {
+        return `# 周计划｜${mark}\n\n## 本周目标（3-5条）\n- [ ] \n- [ ] \n- [ ] \n\n## 关键项目推进\n- 项目A：\n- 项目B：\n\n## 本周复盘（周末填写）\n- 做得好：\n- 可改进：\n- 下周优先级：`;
+      }
+      if (type === 'monthly') {
+        return `# 月计划｜${mark}\n\n## 本月目标\n- [ ] 工作\n- [ ] 学习\n- [ ] 生活/健康\n\n## 关键结果（KR）\n- KR1:\n- KR2:\n- KR3:\n\n## 月末复盘\n- 达成情况：\n- 问题与原因：\n- 下月策略：`;
+      }
+      return defaultContent();
+    }
+
     function filteredArticles() {
       const q = (state.search || '').trim().toLowerCase();
       const selectedTag = state.selectedTag;
+      const planFilter = state.planFilter || 'all';
 
       const list = [...state.articles];
       const sortBy = state.sortBy || 'date_desc';
@@ -868,10 +1143,12 @@
 
       return list.filter(a => {
         const tags = a.tags || [];
+        const type = a.planType || 'normal';
+        if (planFilter !== 'all' && type !== planFilter) return false;
         if (selectedTag && !tags.includes(selectedTag)) return false;
         if (!q) return true;
 
-        const haystack = [a.title || '', a.content || '', tags.join(' ')].join('\n').toLowerCase();
+        const haystack = [a.title || '', a.content || '', a.planDate || '', planTypeLabel(type), tags.join(' ')].join('\n').toLowerCase();
         return haystack.includes(q);
       });
     }
@@ -918,11 +1195,18 @@
         const btn = document.createElement('button');
         btn.className = 'article-item' + (article.id === state.activeId ? ' active' : '');
         const tagsHtml = (article.tags || []).map(t => `<span class="article-tag">${escapeHtml(t)}</span>`).join('');
+        const typeLabel = planTypeLabel(article.planType || 'normal');
+        const planDate = article.planDate ? ` · ${escapeHtml(article.planDate)}` : '';
+        const progress = detectPlanProgress(article.content || '');
+        const progressHtml = progress
+          ? `<div class="article-progress">进度 ${progress.done}/${progress.all}（${progress.rate}%）</div>`
+          : '';
 
         btn.innerHTML = `
           <div class="article-title">${escapeHtml(article.title || '未命名文章')}</div>
-          <div class="article-meta">更新于 ${formatTime(article.updatedAt)}</div>
+          <div class="article-meta"><span class="plan-pill">${escapeHtml(typeLabel)}</span>更新于 ${formatTime(article.updatedAt)}${planDate}</div>
           <div class="article-tags">${tagsHtml || ''}</div>
+          ${progressHtml}
         `;
 
         btn.addEventListener('click', () => switchArticle(article.id));
@@ -953,13 +1237,18 @@
       saveState();
     }
 
-    function createArticle(title = '新文章') {
+    function createArticle(title = '新文章', options = {}) {
       const t = now();
+      const planType = options.planType || 'normal';
+      const planDate = options.planDate || '';
+      const presetContent = typeof options.content === 'string' ? options.content : null;
       const article = {
         id: newId(),
         title,
-        tags: [],
-        content: state.articles.length ? '' : defaultContent(),
+        tags: Array.isArray(options.tags) ? options.tags : [],
+        planType,
+        planDate,
+        content: presetContent !== null ? presetContent : (state.articles.length ? '' : defaultContent()),
         createdAt: t,
         updatedAt: t,
         version: 1,
@@ -1154,7 +1443,7 @@
               version: 1,
               _existsInCloud: false
             };
-            state = { activeId: article.id, search: '', selectedTag: '', listCollapsed: false, sortBy: 'date_desc', editorRatio: 0.5, articles: [article] };
+            state = { activeId: article.id, search: '', selectedTag: '', listCollapsed: false, sortBy: 'date_desc', planFilter: 'all', searchCollapsed: true, editorRatio: 0.5, articles: [article] };
             saveState();
             return;
           }
@@ -1167,11 +1456,15 @@
               selectedTag: parsed.selectedTag || '',
               listCollapsed: Boolean(parsed.listCollapsed),
               sortBy: parsed.sortBy || 'date_desc',
+              planFilter: parsed.planFilter || 'all',
+              searchCollapsed: parsed.searchCollapsed !== false,
               editorRatio: clampEditorRatio(parsed.editorRatio ?? 0.5),
               articles: parsed.articles.map(a => ({
                 id: a.id || newId(),
                 title: a.title || '未命名文章',
                 tags: Array.isArray(a.tags) ? a.tags : [],
+                planType: a.planType || 'normal',
+                planDate: a.planDate || '',
                 content: a.content || '',
                 createdAt: a.createdAt || now(),
                 updatedAt: a.updatedAt || now(),
@@ -1523,12 +1816,16 @@
               selectedTag: parsed.selectedTag || '',
               listCollapsed: Boolean(parsed.listCollapsed),
               sortBy: parsed.sortBy || 'date_desc',
+              planFilter: parsed.planFilter || 'all',
+              searchCollapsed: parsed.searchCollapsed !== false,
               editorRatio: clampEditorRatio(parsed.editorRatio ?? 0.5),
               articles: parsed.articles.map(a => ({
                 id: a.id || newId(),
                 title: a.title || '未命名文章',
                 content: a.content || '',
                 tags: Array.isArray(a.tags) ? a.tags : [],
+                planType: a.planType || 'normal',
+                planDate: a.planDate || '',
                 createdAt: a.createdAt || now(),
                 updatedAt: a.updatedAt || now(),
                 version: Number.isFinite(Number(a.version)) ? Number(a.version) : 1,
@@ -1547,6 +1844,8 @@
         }
         searchInput.value = state.search || '';
         sortSelect.value = state.sortBy || 'date_desc';
+        if (planFilterSelect) planFilterSelect.value = state.planFilter || 'all';
+        applySearchCollapsedUI();
         applyEditorPreviewRatio();
         applyListCollapsedUI();
         renderTagFilter();
@@ -1557,6 +1856,7 @@
 
       applyEditorPreviewRatio();
       applyListCollapsedUI();
+      applySearchCollapsedUI();
       initEditorPreviewSplitter();
       initSupabaseAuth();
     }
@@ -1590,6 +1890,19 @@
       saveState();
     });
 
+    searchToggleBtn?.addEventListener('click', () => {
+      setSearchCollapsed(!state.searchCollapsed);
+      if (!state.searchCollapsed) {
+        searchInput?.focus();
+      }
+    });
+
+    planFilterSelect?.addEventListener('change', () => {
+      state.planFilter = planFilterSelect.value || 'all';
+      renderArticleList();
+      saveState();
+    });
+
     toggleListBtn?.addEventListener('click', () => {
       setListCollapsed(!state.listCollapsed);
     });
@@ -1603,14 +1916,57 @@
     });
 
     newArticleBtn.addEventListener('click', () => {
+      const pick = prompt(
+        '新建类型：\n1 = 日计划\n2 = 周计划\n3 = 月计划\n4 = 普通文章',
+        '1'
+      );
+      const choice = String(pick || '4').trim();
+
+      if (choice === '1') {
+        const mark = todayDateStr();
+        createArticle(`日计划｜${mark}`, {
+          planType: 'daily',
+          planDate: mark,
+          tags: ['计划', '日计划'],
+          content: buildPlanTemplate('daily', mark)
+        });
+        return;
+      }
+
+      if (choice === '2') {
+        const mark = weekStr();
+        createArticle(`周计划｜${mark}`, {
+          planType: 'weekly',
+          planDate: mark,
+          tags: ['计划', '周计划'],
+          content: buildPlanTemplate('weekly', mark)
+        });
+        return;
+      }
+
+      if (choice === '3') {
+        const mark = monthStr();
+        createArticle(`月计划｜${mark}`, {
+          planType: 'monthly',
+          planDate: mark,
+          tags: ['计划', '月计划'],
+          content: buildPlanTemplate('monthly', mark)
+        });
+        return;
+      }
+
       const title = prompt('新文章标题（可留空）', '新文章');
-      createArticle((title || '新文章').trim() || '新文章');
+      createArticle((title || '新文章').trim() || '新文章', {
+        planType: 'normal',
+        planDate: ''
+      });
     });
 
     renameBtn.addEventListener('click', renameActiveArticle);
     saveTagsBtn.addEventListener('click', saveTagsForActiveArticle);
     exportBtn.addEventListener('click', exportActiveArticleAsMarkdown);
     exportAllBtn.addEventListener('click', exportAllAsZip);
+    readPageBtn?.addEventListener('click', openReadPage);
 
     importBtn.addEventListener('click', () => {
       importFileInput.value = '';
