@@ -147,6 +147,10 @@
       flex-direction: column;
       align-items: stretch;
       gap: 8px;
+      padding: 4px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #ffffff 0%, #f6f9ff 100%);
+      border: 1px solid #e8eef9;
     }
 
     .list-head-top,
@@ -156,12 +160,14 @@
       justify-content: space-between;
       gap: 8px;
       flex-wrap: wrap;
+      padding: 2px 4px;
     }
 
     .list-head-top > span {
       font-size: 14px;
       color: #475467;
       font-weight: 600;
+      letter-spacing: .2px;
     }
 
     .list-head-actions {
@@ -179,10 +185,23 @@
 
     .list-head-actions .btn {
       background: #f8faff;
+      border-color: #dbe5f8;
+    }
+
+    #searchToggleBtn,
+    #exportAllBtn {
+      padding-left: 9px;
+      padding-right: 9px;
+      letter-spacing: 0;
+    }
+
+    #searchToggleBtn {
+      border-radius: 999px;
     }
 
     #exportAllBtn {
       border-style: dashed;
+      border-radius: 999px;
     }
 
     .toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -213,6 +232,7 @@
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
       color: #fff;
       border-color: transparent;
+      box-shadow: 0 8px 18px rgba(79, 70, 229, 0.26);
     }
     .btn-primary:hover { color: #fff; filter: brightness(1.03); }
     .btn-danger:hover { border-color: var(--danger); color: var(--danger); }
@@ -232,6 +252,7 @@
       border: 1px solid #e7edf8;
       border-radius: 12px;
       background: linear-gradient(180deg, #ffffff, #f9fbff);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.75);
     }
 
     body.search-collapsed .search-wrap {
@@ -326,12 +347,13 @@
       text-align: left;
       border: 1px solid #edf1f8;
       background: #fff;
-      padding: 10px;
+      padding: 11px;
       border-radius: 12px;
       cursor: pointer;
       margin-bottom: 8px;
       transition: all .16s ease;
       box-shadow: 0 2px 10px rgba(15,23,42,.04);
+      position: relative;
     }
     .article-item:hover {
       border-color: #cfdaf0;
@@ -342,6 +364,16 @@
       border-color: #bfd2ff;
       background: var(--accent-soft);
       box-shadow: 0 6px 16px rgba(59,130,246,.14);
+    }
+    .article-item.active::before {
+      content: '';
+      position: absolute;
+      left: -1px;
+      top: 10px;
+      bottom: 10px;
+      width: 4px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #4f46e5, #60a5fa);
     }
 
     .article-title {
@@ -521,9 +553,9 @@
         <div class="list-head-actions">
           <div class="list-head-actions-left">
             <button class="btn" id="toggleListBtn" title="折叠/展开文章列表">⟨ 侧栏</button>
-            <button class="btn" id="searchToggleBtn" title="展开/收起搜索筛选">🔎 搜索</button>
+            <button class="btn" id="searchToggleBtn" title="展开/收起搜索筛选">🔎搜索</button>
           </div>
-          <button class="btn" id="exportAllBtn">⤓ 导出 ZIP</button>
+          <button class="btn" id="exportAllBtn">⤓导出ZIP</button>
         </div>
       </div>
 
