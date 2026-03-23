@@ -537,6 +537,7 @@
     <div class="top-right">
       <button class="btn" id="expandListBtn" style="display:none">☰ 展开文章列表</button>
       <span class="cloud-status" id="cloudStatus">未连接云同步</span>
+      <span class="hint" id="accountInfo" style="display:none">未登录 GitHub</span>
       <button class="btn" id="loginBtn">GitHub 登录同步</button>
       <button class="btn" id="logoutBtn" style="display:none">退出登录</button>
       <span class="hint" id="saveStatus">已自动保存</span>
@@ -673,6 +674,7 @@
     const saveStatus = document.getElementById('saveStatus');
 
     const cloudStatus = document.getElementById('cloudStatus');
+    const accountInfo = document.getElementById('accountInfo');
     const loginBtn = document.getElementById('loginBtn');
     const logoutBtn = document.getElementById('logoutBtn');
 
@@ -1536,14 +1538,29 @@
       });
     }
 
+    function getGithubDisplayName(user) {
+      const meta = user?.user_metadata || {};
+      return meta.user_name || meta.preferred_username || meta.full_name || user?.email || user?.id || '未知账号';
+    }
+
     function updateAuthUI() {
       if (currentUser) {
         loginBtn.style.display = 'none';
         logoutBtn.style.display = '';
+        if (accountInfo) {
+          accountInfo.style.display = '';
+          accountInfo.textContent = `GitHub：${getGithubDisplayName(currentUser)}`;
+          accountInfo.title = currentUser.email || '';
+        }
         setCloudStatus('云同步已连接', true);
       } else {
         loginBtn.style.display = '';
         logoutBtn.style.display = 'none';
+        if (accountInfo) {
+          accountInfo.style.display = 'none';
+          accountInfo.textContent = '未登录 GitHub';
+          accountInfo.title = '';
+        }
         setCloudStatus('未连接云同步', false);
       }
     }
