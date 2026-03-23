@@ -1238,7 +1238,7 @@
 
         btn.innerHTML = `
           <div class="article-title">${escapeHtml(article.title || '未命名文章')}</div>
-          <div class="article-meta"><span class="plan-pill">${escapeHtml(typeLabel)}</span>更新于 ${formatTime(article.updatedAt)}${planDate}</div>
+          <div class="article-meta"><span class="plan-pill">${escapeHtml(typeLabel)}</span>创建于 ${formatTime(article.createdAt || article.updatedAt)}${planDate}</div>
           <div class="article-tags">${tagsHtml || ''}</div>
           ${progressHtml}
         `;
