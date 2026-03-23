@@ -540,7 +540,7 @@
       <span class="hint" id="accountInfo" style="display:none">未登录 GitHub</span>
       <button class="btn" id="loginBtn">GitHub 登录同步</button>
       <button class="btn" id="logoutBtn" style="display:none">退出登录</button>
-      <span class="hint" id="saveStatus">已自动保存</span>
+      <span class="hint" id="saveStatus"></span>
     </div>
   </header>
 
@@ -722,39 +722,12 @@
       return state.articles.find(a => a.id === state.activeId) || null;
     }
 
-    let statusMode = 'saved';
-    let statusTextTimer = null;
-
     function setStatus(mode) {
-      statusMode = mode;
-      if (statusTextTimer) {
-        clearTimeout(statusTextTimer);
-        statusTextTimer = null;
-      }
-
-      if (mode === 'editing') {
-        saveStatus.textContent = '● 正在编辑';
-        return;
-      }
-      if (mode === 'saving') {
-        saveStatus.textContent = '↻ 正在保存';
-        return;
-      }
-      if (mode === 'synced') {
-        saveStatus.textContent = '☁ 已同步';
-        statusTextTimer = setTimeout(() => {
-          if (statusMode === 'synced') {
-            saveStatus.textContent = '✓ 已保存';
-            statusMode = 'saved';
-          }
-        }, 1800);
-        return;
-      }
       if (mode === 'error') {
         saveStatus.textContent = '⚠ 保存失败';
         return;
       }
-      saveStatus.textContent = '✓ 已保存';
+      saveStatus.textContent = '';
     }
 
     function setCloudStatus(text, ok = false) {
