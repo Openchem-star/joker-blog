@@ -722,7 +722,40 @@
       return state.articles.find(a => a.id === state.activeId) || null;
     }
 
-    function setStatus(text) { saveStatus.textContent = text; }
+    let statusMode = 'saved';
+    let statusTextTimer = null;
+
+    function setStatus(mode) {
+      statusMode = mode;
+      if (statusTextTimer) {
+        clearTimeout(statusTextTimer);
+        statusTextTimer = null;
+      }
+
+      if (mode === 'editing') {
+        saveStatus.textContent = '● 正在编辑';
+        return;
+      }
+      if (mode === 'saving') {
+        saveStatus.textContent = '↻ 正在保存';
+        return;
+      }
+      if (mode === 'synced') {
+        saveStatus.textContent = '☁ 已同步';
+        statusTextTimer = setTimeout(() => {
+          if (statusMode === 'synced') {
+            saveStatus.textContent = '✓ 已保存';
+            statusMode = 'saved';
+          }
+        }, 1800);
+        return;
+      }
+      if (mode === 'error') {
+        saveStatus.textContent = '⚠ 保存失败';
+        return;
+      }
+      saveStatus.textContent = '✓ 已保存';
+    }
 
     function setCloudStatus(text, ok = false) {
       cloudStatus.textContent = text;
@@ -820,7 +853,7 @@
 
     function saveState() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      setStatus('已自动保存 · ' + new Date().toLocaleTimeString());
+      setStatus('saved');
       scheduleCloudPush();
     }
 
@@ -1049,7 +1082,7 @@
       }
 
       try {
-        setStatus(source === 'paste' ? '正在压缩并上传粘贴图片...' : '正在压缩并上传图片...');
+        setStatus('saving');
 
         const normalized = await normalizeImageForUpload(file);
         const wrappedFile = new File([normalized.blob], normalized.fileName, { type: normalized.mimeType });
@@ -1084,11 +1117,12 @@
 
         const before = formatBytes(normalized.originalBytes);
         const after = formatBytes(normalized.processedBytes);
-        setStatus(`图片已上传并插入（${before} → ${after}）· ${new Date().toLocaleTimeString()}`);
+        console.log(`图片已上传并插入（${before} → ${after}）`);
+        setStatus('saved');
       } catch (err) {
         console.error(err);
         alert(`图片上传失败：${err?.message || err}\n\n请确认：\n1) 已登录 GitHub\n2) Supabase Storage 存在 bucket: ${IMAGE_BUCKET}\n3) 该 bucket 允许读取（Public）或已配置可访问策略`);
-        setStatus('图片上传失败');
+        setStatus('error');
       } finally {
         imageUploading = false;
         if (uploadImageBtn) {
@@ -1918,7 +1952,7 @@
       a.content = editor.value;
       a.updatedAt = now();
       renderPreview(a.content);
-      setStatus('输入中...');
+      setStatus('editing');
 
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
