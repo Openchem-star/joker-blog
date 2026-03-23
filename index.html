@@ -1925,27 +1925,6 @@
     }
 
     let debounceTimer = null;
-    function keepEditorCaretVisible() {
-      try {
-        const start = editor.selectionStart || 0;
-        const before = editor.value.slice(0, start);
-        const lineCount = before.split('\n').length;
-        const style = window.getComputedStyle(editor);
-        const lineHeight = parseFloat(style.lineHeight) || 25;
-        const paddingTop = parseFloat(style.paddingTop) || 0;
-        const caretTop = paddingTop + Math.max(0, lineCount - 1) * lineHeight;
-        const viewTop = editor.scrollTop;
-        const viewBottom = viewTop + editor.clientHeight;
-        const margin = lineHeight * 3;
-
-        if (caretTop + margin > viewBottom) {
-          editor.scrollTop = caretTop - editor.clientHeight + margin;
-        } else if (caretTop - margin < viewTop) {
-          editor.scrollTop = Math.max(0, caretTop - margin);
-        }
-      } catch (_) {}
-    }
-
     editor.addEventListener('input', () => {
       const a = activeArticle();
       if (!a) return;
@@ -1954,7 +1933,6 @@
       a.updatedAt = now();
       renderPreview(a.content);
       setStatus('editing');
-      keepEditorCaretVisible();
 
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
@@ -1962,9 +1940,6 @@
         saveState();
       }, 260);
     });
-
-    editor.addEventListener('click', keepEditorCaretVisible);
-    editor.addEventListener('keyup', keepEditorCaretVisible);
 
     searchInput.addEventListener('input', () => {
       state.search = searchInput.value || '';
