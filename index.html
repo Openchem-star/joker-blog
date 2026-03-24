@@ -1900,7 +1900,17 @@
       }
 
       if (!state.articles.length) {
-        createArticle('我的第一篇');
+        state.activeId = null;
+        searchInput.value = state.search || '';
+        sortSelect.value = state.sortBy || 'date_desc';
+        if (planFilterSelect) planFilterSelect.value = state.planFilter || 'all';
+        applySearchCollapsedUI();
+        applyEditorPreviewRatio();
+        applyListCollapsedUI();
+        renderTagFilter();
+        renderArticleList();
+        renderEditor();
+        saveState();
       } else {
         if (!state.activeId || !state.articles.find(a => a.id === state.activeId)) {
           state.activeId = state.articles[0].id;
